@@ -1,6 +1,7 @@
 var heroList;
 var selfTeam = [];
 var enemyTeam = [];
+var heroData;
 // heroName has to be Valid!
 function AddHero(heroName) {
     if (heroName.toLowerCase() != heroName) {
@@ -10,20 +11,104 @@ function AddHero(heroName) {
     var imgSrc = 'http://cdn.dota2.com/apps/dota2/images/heroes/' + heroName.toLowerCase() + '_lg.png'
     html += '<div class="hero" heroName="' + heroName + '">';
     html += '<img src="' + imgSrc + '">';
-    html += '<div class="hero_data">';
-    html += GetHeroData(heroName);
+    html += '<div class="hero_data" heroName="' + heroName + '">';
+    html += GetHeroDataHtml(heroName);
     html += '</div>'
     html += '</div>';
     return html
 }
-function GetHeroData(heroName) {
-    html = ""
-    html += "Team +2.0%<br>";
-    html += "Opp -2.0%";
-    return html
+function GetHeroDataHtml(heroName) {
+    html = $("<p>");
+    var d = GetHeroData(heroName);
+    var team = d[0];
+    var opp = -d[1];
+    var $t = $("<span>");
+    var team_color_sat = 255 - Math.min(255, Math.round(Math.abs(team/5*255))).toString();
+    var opp_color_sat = 255 - Math.min(255, Math.round(Math.abs(opp/5*255))).toString();
+    if (team > 0) {
+        $t.text("Team +" + team + "%");
+        $t.css({"color":"rgb(" +team_color_sat+",255,"+team_color_sat+")"});
+    } else {
+        $t.text("Team " + team + "%");
+        $t.css({"color":"rgb(255,"+team_color_sat+","+team_color_sat+")"});
+    }
+    html.append($t);
+    html.append("<br>")
+    var $t = $("<span>");
+    if (opp > 0) {
+        $t.text("Opp +" + opp + "%");
+        $t.css({"color":"rgb(" +opp_color_sat+",255,"+opp_color_sat+")"});
+    } else {
+        $t.text("Opp " + opp + "%");
+        $t.css({"color":"rgb(255,"+opp_color_sat+","+opp_color_sat+")"});
+    }
+    html.append($t);
+    return html.html()
 }
-function ImageClear() {
-    
+function GetHeroData(heroName) {
+    var old_rate = GetWinRate();
+    var self_rate = 0;
+    var enemy_rate = 0;
+    // Pretend self choose this hero, if team full, ignore
+    if (selfTeam.length < 5) {
+        selfTeam.push(heroName);
+        self_rate = GetWinRate() - old_rate;
+        selfTeam.pop();
+    }
+
+    if (enemyTeam.length < 5) {
+        enemyTeam.push(heroName);
+        enemy_rate = GetWinRate() - old_rate;
+        enemyTeam.pop();
+    }
+    return [self_rate.toFixed(2), enemy_rate.toFixed(2)]
+}
+function GetWinRate() {
+    var win_self = 50;
+    var adv_team = 1;
+    var win_enemy = 50;
+    var adv_enemy = 1;
+    // Calculate self team 
+    for (var i = 0; i < selfTeam.length; i++) {
+        var name = selfTeam[i];
+        var rate = GetHeroRate(name);
+        for (var j = i+1; j < selfTeam.length; j++) {
+            if (selfTeam[j] != name)
+                adv_team = adv_team * (GetTeamMate(name, selfTeam[j]));
+        }
+        for (var j = 0; j < enemyTeam.length; j++) {
+            if (enemyTeam[j] != name)
+                adv_team = adv_team * (GetMatchUp(name, enemyTeam[j]));
+        }
+        win_self = win_self*rate*adv_team;
+    }
+    for (var i = 0; i < enemyTeam.length; i++) {
+        var name = enemyTeam[i];
+        var rate = GetHeroRate(name);
+        for (var j = i+1; j < enemyTeam.length; j++) {
+            adv_enemy = adv_enemy * (GetTeamMate(name, enemyTeam[j]));
+        }
+        win_enemy = win_enemy * adv_enemy * rate;
+    }
+    return (win_self/(win_self+win_enemy)*100).toFixed(2);
+}
+// Win rate calculation functions
+function GetMatchUp(heroName1, heroName2) {
+    if (heroData)
+        return heroData[heroName1]["matchup"][heroName2];
+    return 1;
+}
+function GetTeamMate(heroName1, heroName2) {
+    if (heroData)
+        return heroData[heroName1]["teammate"][heroName2];
+    return 1;
+}
+function GetHeroRate(heroName) {
+    console.log(heroName)
+    if (heroData) {
+        return heroData[heroName]["rate"];
+    }
+    return 1;
 }
 function RefreshHeroDiv(d) {
     d.empty();
@@ -56,7 +141,13 @@ function RefreshPage() {
             $('#on_stage_hero_enemy_div').append($("<div>", {"class":"col on_stage_hero enemy_on_stage_hero"}));
         }
     }
+    // Update win rate here
+    $('#win_rate_p').text("Win Rate: " + GetWinRate().toString() + "%");
 
+    // Refresh hero rate
+    $(".hero_data").each(function() {
+        $(this).html(GetHeroDataHtml($(this).attr("heroName")));
+    });
 }
 $(document).ready(function() {
     // Put all heros
@@ -91,8 +182,13 @@ $(document).ready(function() {
         }
     });
 
+    $.getJSON("hero_data.json", function(data) {
+        heroData = JSON.parse(JSON.stringify(data));
+    })
+    .done(function() {
+        RefreshPage();
+    });
     // Setup the on stage slots
-    RefreshPage();
     $('body')
     .on('click', 'img', function(e) {
         if ($(this).parent().parent().hasClass("self_on_stage_hero")) {

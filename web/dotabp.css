@@ -15,6 +15,13 @@ body {
     margin:5px;
     background-color:#333333;
 }
+#win_rate_div {
+    font-size:25px;
+}
+#win_rate_p {
+    width:100%;
+    text-align:center;
+}
 .hero_data {
     font-size:12px;
 }

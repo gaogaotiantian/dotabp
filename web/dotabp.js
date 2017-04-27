@@ -6,7 +6,7 @@ var heroData;
 // Input of the function is -1 to 1
 // If it's not, it will be saturated
 function RateToColor(rate) {
-    colorStr = "rgb("
+    var colorStr = "rgb("
     if (rate > 1) {
         rate = 1;
     } else if (rate < -1) {
@@ -43,7 +43,7 @@ function AddHero(heroName) {
     return html
 }
 function GetHeroDataHtml(heroName, heroType = "") {
-    html = $("<p>");
+    var html = $("<p>");
     var d = GetHeroData(heroName);
     var team = d[0];
     var opp = -d[1];

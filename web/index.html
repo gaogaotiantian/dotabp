@@ -4,7 +4,14 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Dota ban/pick helper</title>
+    <title>Dota Ban/Pick Helper</title>
+    <meta name="author" content="Tian Gao">
+    <meta property="og:title" content="Dota2 Hero Pick Tool">
+    <meta property="og:site_name" content="dotabp.com">
+    <meta property="og:description" content="The tool that helps you pick the hero better.">
+    <meta property="og:url" content="http://dotabp.com">
+    <meta name="description" content="A simple, updated, easy to use hero picking tool for dota2. Hero win rate, team cooperation and matchup counter are all considered.">
+    <meta name="keywords" content="dota 2, draft, pick, ban, dota 2 hero">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
@@ -27,7 +34,7 @@
     <div class="row">
       <div class="col-10">
         <div class="page-header">
-          <h1 class="multi_language" id="match_status">Match Status</h1>
+          <h1 class="multi_language" id="match_status"></h1>
         </div>
       </div>
       <div id="language_div" class="col-2">
@@ -41,7 +48,7 @@
     <div class="row hero_row_div" id="on_stage_hero_div">
       <div class="col" style="border-style:solid">
         <div class="row">
-          <h2 class="multi_language" id="your_team">Your Team</h2>
+          <h2 class="multi_language" id="your_team"></h2>
         </div>
         <div class="row no-gutters" id="on_stage_hero_self_div">
         </div>
@@ -49,17 +56,17 @@
       <div class="col1"></div>
       <div class="col" style="border-style:solid">
         <div class="row">
-          <h2 class="multi_language" id="enemy_team">Enemy Team</h2>
+          <h2 class="multi_language" id="enemy_team"></h2>
         </div>
         <div class="row no-gutters" id="on_stage_hero_enemy_div">
         </div>
       </div>
     </div>
     <div class="row" id="win_rate_div">
-      <p id="win_rate_p"><span class="multi_language" id="win_rate"></span><span id="win_rate_val">50%</span></p>
+      <p id="win_rate_p"><span class="multi_language" id="win_rate"></span><span id="win_rate_val"></span></p>
     </div>
     <div class=page-header>
-      <h1 class="multi_language" id="choose_hero">Choose Hero</h1>
+      <h1 class="multi_language" id="choose_hero"></h1>
     </div>
     <div class="hero_row_div">
       <div class="row no-gutters off_stage_hero_div" id="off_stage_hero_div_str_1">
